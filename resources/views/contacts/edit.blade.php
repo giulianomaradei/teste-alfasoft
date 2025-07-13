@@ -165,7 +165,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black bg-opacity-50 p-4">
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4">
         <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
             <div class="p-6">
                 <div class="mb-4 flex items-center">
@@ -191,7 +191,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                 stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
                         <span id="modalButtonText">Excluir</span>
@@ -214,11 +214,15 @@
         function openDeleteModal(contactId, contactName) {
             currentContactId = contactId;
             document.getElementById('contactName').textContent = contactName;
-            document.getElementById('deleteModal').classList.remove('hidden');
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
             currentContactId = null;
 
             // Reset modal button state
