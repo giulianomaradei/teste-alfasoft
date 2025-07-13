@@ -546,16 +546,161 @@
                 // Reexecuta scripts necessários para a nova página
                 const scripts = this.mainContent.querySelectorAll('script');
                 scripts.forEach(script => {
-                    const newScript = document.createElement('script');
-                    newScript.textContent = script.textContent;
-                    script.parentNode.replaceChild(newScript, script);
+                    try {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        script.parentNode.replaceChild(newScript, script);
+                    } catch (error) {
+                        console.error('Erro ao executar script:', error);
+                    }
+                });
+
+                // Reinicializa event listeners específicos
+                this.reinitializePageScripts();
+            }
+
+            reinitializePageScripts() {
+                // Reinicializa modais de exclusão se existirem
+                const deleteModal = document.getElementById('deleteModal');
+                if (deleteModal) {
+                    this.initializeDeleteModal();
+                }
+
+                // Reinicializa outros componentes se necessário
+                this.initializeFormSubmissions();
+            }
+
+            initializeDeleteModal() {
+                const deleteModal = document.getElementById('deleteModal');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                const deleteBtns = document.querySelectorAll('#deleteBtn');
+
+                if (!deleteModal) return;
+
+                // Remove event listeners anteriores (se existirem)
+                const newCancelBtn = cancelBtn?.cloneNode(true);
+                const newConfirmBtn = confirmDeleteBtn?.cloneNode(true);
+
+                if (cancelBtn && newCancelBtn) {
+                    cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+                }
+                if (confirmDeleteBtn && newConfirmBtn) {
+                    confirmDeleteBtn.parentNode?.replaceChild(newConfirmBtn, confirmDeleteBtn);
+                }
+
+                // Redefine funções globais para o modal
+                window.openDeleteModal = function(contactId, contactName) {
+                    window.currentContactId = contactId;
+                    const contactNameEl = document.getElementById('contactName');
+                    if (contactNameEl) {
+                        contactNameEl.textContent = contactName;
+                    }
+                    deleteModal.classList.remove('hidden');
+                    deleteModal.classList.add('flex');
+                };
+
+                window.closeDeleteModal = function() {
+                    deleteModal.classList.add('hidden');
+                    deleteModal.classList.remove('flex');
+                    window.currentContactId = null;
+
+                    // Reset modal button state
+                    const confirmBtn = document.getElementById('confirmDeleteBtn');
+                    const modalDeleteIcon = document.getElementById('modalDeleteIcon');
+                    const modalLoadingIcon = document.getElementById('modalLoadingIcon');
+                    const modalButtonText = document.getElementById('modalButtonText');
+
+                    if (confirmBtn) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.classList.remove('bg-red-500');
+                        confirmBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    }
+                    if (modalDeleteIcon) modalDeleteIcon.classList.remove('hidden');
+                    if (modalLoadingIcon) modalLoadingIcon.classList.add('hidden');
+                    if (modalButtonText) modalButtonText.textContent = 'Excluir';
+                };
+
+                // Adiciona event listeners aos botões de exclusão
+                deleteBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const contactId = this.getAttribute('data-contact-id') ||
+                                         this.onclick?.toString().match(/\d+/)?.[0];
+                        const contactName = this.getAttribute('data-contact-name') ||
+                                           this.onclick?.toString().match(/'([^']+)'/)?.[1];
+                        if (contactId && contactName) {
+                            window.openDeleteModal(parseInt(contactId), contactName);
+                        }
+                    });
+                });
+
+                // Event listener para o botão cancelar
+                const finalCancelBtn = document.getElementById('cancelBtn');
+                if (finalCancelBtn) {
+                    finalCancelBtn.addEventListener('click', window.closeDeleteModal);
+                }
+
+                // Event listener para fechar clicando fora do modal
+                deleteModal.addEventListener('click', function(e) {
+                    if (e.target === deleteModal) {
+                        window.closeDeleteModal();
+                    }
+                });
+
+                // Event listener para o botão confirmar
+                const finalConfirmBtn = document.getElementById('confirmDeleteBtn');
+                if (finalConfirmBtn) {
+                    finalConfirmBtn.addEventListener('click', function() {
+                        if (window.currentContactId) {
+                            const form = document.getElementById(`deleteForm-${window.currentContactId}`);
+                            const modalDeleteIcon = document.getElementById('modalDeleteIcon');
+                            const modalLoadingIcon = document.getElementById('modalLoadingIcon');
+                            const modalButtonText = document.getElementById('modalButtonText');
+
+                            // Show loading state
+                            this.disabled = true;
+                            if (modalDeleteIcon) modalDeleteIcon.classList.add('hidden');
+                            if (modalLoadingIcon) modalLoadingIcon.classList.remove('hidden');
+                            if (modalButtonText) modalButtonText.textContent = 'Excluindo...';
+
+                            // Change button styling
+                            this.classList.remove('hover:bg-red-700');
+                            this.classList.add('bg-red-500');
+
+                            // Submit the form
+                            if (form) form.submit();
+                        }
+                    });
+                }
+
+                // ESC key listener
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+                        window.closeDeleteModal();
+                    }
+                });
+            }
+
+            initializeFormSubmissions() {
+                // Reinicializa loading states dos formulários se necessário
+                const forms = document.querySelectorAll('form');
+                forms.forEach(form => {
+                    if (form.id === 'contactForm' || form.querySelector('#submitButton')) {
+                        // Lógica para reinicializar formulários já existe nos scripts inline
+                        // Esta função pode ser expandida se necessário
+                    }
                 });
             }
         }
 
         // Inicializa o sistema de transição
         document.addEventListener('DOMContentLoaded', () => {
-            new PageTransition();
+            const pageTransition = new PageTransition();
+
+            // Inicializa componentes na primeira carga
+            if (document.getElementById('deleteModal')) {
+                pageTransition.initializeDeleteModal();
+            }
         });
 
         function showToast(message) {

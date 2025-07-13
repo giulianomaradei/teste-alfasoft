@@ -89,6 +89,8 @@
                                     Cancelar
                                 </a>
                                 <button type="button" id="deleteBtn"
+                                    data-contact-id="{{ $contact->id }}"
+                                    data-contact-name="{{ $contact->name }}"
                                     class="flex-1 inline-flex items-center justify-center rounded-lg bg-red-600 px-6 py-3 font-medium text-white transition-colors hover:bg-red-700">
                                     <i class="fas fa-trash mr-2 sm:visible hidden"></i>
                                     Excluir
@@ -105,6 +107,8 @@
                                     Cancelar
                                 </a>
                                 <button type="button" id="deleteBtn"
+                                    data-contact-id="{{ $contact->id }}"
+                                    data-contact-name="{{ $contact->name }}"
                                     class="inline-flex items-center rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition-colors hover:bg-red-700">
                                     <i class="fas fa-trash mr-2"></i>
                                     Excluir

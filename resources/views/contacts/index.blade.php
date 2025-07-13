@@ -107,6 +107,8 @@
                                                     <hr class="my-1 border-gray-100">
 
                                                     <button type="button"
+                                                            data-contact-id="{{ $contact->id }}"
+                                                            data-contact-name="{{ $contact->name }}"
                                                             onclick="openDeleteModal({{ $contact->id }}, '{{ addslashes($contact->name) }}')"
                                                             class="flex w-full items-center px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50">
                                                         <i class="fas fa-trash mr-3 h-4 w-4"></i>
