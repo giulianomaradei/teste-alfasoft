@@ -14,7 +14,7 @@
                 </p>
             </div>
             <a href="{{ route('contacts.create') }}"
-                class="flex items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700">
+                class="flex items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 page-link">
                 <i class="fas fa-user-plus mr-2"></i>
                 Novo Contato
             </a>
@@ -38,7 +38,7 @@
                     <h3 class="mb-2 text-lg font-medium text-gray-900">Nenhum contato cadastrado</h3>
                     <p class="mb-4 text-gray-600">Comece adicionando seu primeiro contato.</p>
                     <a href="{{ route('contacts.create') }}"
-                        class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700">
+                        class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 page-link">
                         <i class="fas fa-user-plus mr-2"></i>
                         Adicionar Contato
                     </a>
@@ -58,12 +58,12 @@
                                     </div>
                                     <div class="flex gap-2">
                                         <a href="{{ route('contacts.show', $contact) }}"
-                                            class="flex min-w-10 items-center justify-center rounded-lg border border-gray-300 p-2 transition-colors hover:border-blue-300 hover:bg-blue-50"
+                                            class="flex min-w-10 items-center justify-center rounded-lg border border-gray-300 p-2 transition-colors hover:border-blue-300 hover:bg-blue-50 page-link"
                                             title="Ver detalhes">
                                             <i class="fas fa-eye text-gray-600"></i>
                                         </a>
                                         <a href="{{ route('contacts.edit', $contact) }}"
-                                            class="flex min-w-10 items-center justify-center rounded-lg border border-gray-300 p-2 transition-colors hover:border-green-300 hover:bg-green-50"
+                                            class="flex min-w-10 items-center justify-center rounded-lg border border-gray-300 p-2 transition-colors hover:border-green-300 hover:bg-green-50 page-link"
                                             title="Editar">
                                             <i class="fas fa-edit text-gray-600"></i>
                                         </a>

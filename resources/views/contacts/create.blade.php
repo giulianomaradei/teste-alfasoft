@@ -8,7 +8,7 @@
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('contacts.index') }}"
-                class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50">
+                class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50 page-link">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Voltar à Lista
             </a>

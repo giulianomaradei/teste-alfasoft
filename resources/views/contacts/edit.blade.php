@@ -8,7 +8,7 @@
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('contacts.show', $contact) }}"
-                class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50">
+                class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50 page-link">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Voltar aos Detalhes
             </a>
@@ -68,7 +68,7 @@
                     <div class="flex justify-between pt-4">
                         <div class="flex gap-3">
                             <a href="{{ route('contacts.show', $contact) }}"
-                                class="inline-flex items-center rounded-lg bg-gray-500 px-6 py-2 font-medium text-white transition-colors hover:bg-gray-600">
+                                class="inline-flex items-center rounded-lg bg-gray-500 px-6 py-2 font-medium text-white transition-colors hover:bg-gray-600 page-link">
                                 <i class="fas fa-times mr-2"></i>
                                 Cancelar
                             </a>
@@ -203,6 +203,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Store original values
+            const originalValues = {
+                name: '{{ addslashes($contact->name) }}',
+                email: '{{ addslashes($contact->email) }}',
+                contact: '{{ $contact->contact }}'
+            };
+
             // Format contact field to accept only numbers
             const contactField = document.getElementById('contact');
 
@@ -224,6 +231,37 @@
             const saveIcon = document.getElementById('saveIcon');
             const loadingIcon = document.getElementById('loadingIcon');
             const buttonText = document.getElementById('buttonText');
+
+            // Function to check if form has changes
+            function checkFormChanges() {
+                const currentValues = {
+                    name: nameField.value.trim(),
+                    email: emailField.value.trim(),
+                    contact: contactField.value.trim()
+                };
+
+                const hasChanges = Object.keys(originalValues).some(key =>
+                    currentValues[key] !== originalValues[key]
+                );
+
+                if (hasChanges) {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-500');
+                    submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                } else {
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-500');
+                    submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                }
+            }
+
+            // Initialize button state
+            checkFormChanges();
+
+            // Add event listeners to all form fields
+            nameField.addEventListener('input', checkFormChanges);
+            emailField.addEventListener('input', checkFormChanges);
+            contactField.addEventListener('input', checkFormChanges);
 
             // Remove errors when user starts typing
             nameField.addEventListener('input', function() {
@@ -261,6 +299,12 @@
 
             // Form submission loading state
             form.addEventListener('submit', function(e) {
+                // Only proceed if button is not disabled
+                if (submitButton.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+
                 // Prevent multiple submissions by disabling the button immediately
                 submitButton.disabled = true;
 
