@@ -109,7 +109,7 @@
                                                     <button type="button"
                                                             data-contact-id="{{ $contact->id }}"
                                                             data-contact-name="{{ $contact->name }}"
-                                                            onclick="openDeleteModal({{ $contact->id }}, '{{ addslashes($contact->name) }}')"
+                                                            onclick="openDeleteModal({{ $contact->id }}, '{{ htmlspecialchars($contact->name, ENT_QUOTES, 'UTF-8') }}')"
                                                             class="flex w-full items-center px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50">
                                                         <i class="fas fa-trash mr-3 h-4 w-4"></i>
                                                         Excluir
@@ -169,9 +169,13 @@
                             class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                         Cancelar
                     </button>
-                    <button onclick="confirmDelete()"
+                    <button onclick="confirmDelete()" id="deleteButton"
                             class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
-                        Excluir
+                        <span id="deleteButtonText">Excluir</span>
+                        <span id="deleteButtonSpinner" class="hidden">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>
+                            Excluir
+                        </span>
                     </button>
                 </div>
             </div>
@@ -179,10 +183,12 @@
     @endauth
 
     <script>
-        let deleteContactId = null;
+        // Global variable to store the contact ID to be deleted
+        window.deleteContactId = null;
 
         function openDeleteModal(contactId, contactName) {
-            deleteContactId = contactId;
+            console.log('Opening delete modal for contact:', contactId, contactName);
+            window.deleteContactId = contactId;
             document.getElementById('deleteContactName').textContent = contactName;
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('deleteModal').classList.add('flex');
@@ -191,14 +197,60 @@
         function closeDeleteModal() {
             document.getElementById('deleteModal').classList.add('hidden');
             document.getElementById('deleteModal').classList.remove('flex');
-            deleteContactId = null;
+            window.deleteContactId = null;
+            resetDeleteButton();
         }
 
         function confirmDelete() {
-            if (deleteContactId) {
-                document.getElementById('deleteForm-' + deleteContactId).submit();
+            console.log('Confirming delete for contact ID:', window.deleteContactId);
+            if (window.deleteContactId) {
+                // Show loading spinner and disable button
+                const deleteButton = document.getElementById('deleteButton');
+                const deleteButtonText = document.getElementById('deleteButtonText');
+                const deleteButtonSpinner = document.getElementById('deleteButtonSpinner');
+
+                deleteButton.disabled = true;
+                deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+                deleteButtonText.classList.add('hidden');
+                deleteButtonSpinner.classList.remove('hidden');
+
+                const form = document.getElementById('deleteForm-' + window.deleteContactId);
+                console.log('Form found:', form);
+                if (form) {
+                    form.submit();
+                } else {
+                    console.error('Form not found with ID: deleteForm-' + window.deleteContactId);
+                    // Reset button state if form not found
+                    resetDeleteButton();
+                }
+            } else {
+                console.error('No contact ID set for deletion');
             }
         }
+
+        function resetDeleteButton() {
+            const deleteButton = document.getElementById('deleteButton');
+            const deleteButtonText = document.getElementById('deleteButtonText');
+            const deleteButtonSpinner = document.getElementById('deleteButtonSpinner');
+
+            deleteButton.disabled = false;
+            deleteButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            deleteButtonText.classList.remove('hidden');
+            deleteButtonSpinner.classList.add('hidden');
+        }
+
+        // Alternative approach: Add event listener to delete buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event to all delete buttons
+            document.querySelectorAll('[data-contact-id]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const contactId = this.getAttribute('data-contact-id');
+                    const contactName = this.getAttribute('data-contact-name');
+                    console.log('Button clicked - Contact ID:', contactId, 'Name:', contactName);
+                    window.deleteContactId = contactId;
+                });
+            });
+        });
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
