@@ -29,20 +29,61 @@
         .transition-width {
             transition: width 0.3s ease;
         }
+
+        /* Previne layout shift - define estado inicial */
+        .sidebar-initial {
+            width: 16rem;
+            min-width: 16rem;
+        }
+
+        /* Esconde elementos até Alpine.js estar pronto */
+        [x-cloak] {
+            display: none !important;
+        }
+
+        /* Transições suaves para elementos x-show */
+        .alpine-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .alpine-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .alpine-leave {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .alpine-leave-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.2s, transform 0.2s;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
-    <div class="flex min-h-screen w-full" x-data="{ sidebarOpen: true }">
+    <div class="flex min-h-screen w-full" x-data="{
+        sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen')) ?? true,
+        init() {
+            this.$watch('sidebarOpen', value => {
+                localStorage.setItem('sidebarOpen', JSON.stringify(value))
+            })
+        }
+    }" x-cloak>
         <!-- Sidebar -->
         <div :class="sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'"
-            class="transition-width flex flex-col bg-blue-900 text-white">
+            class="transition-width flex flex-col bg-blue-900 text-white sidebar-initial">
             <div class="p-4">
-                <div class="flex items-center" x-show="sidebarOpen">
+                <div class="flex items-center" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
                     <i class="fas fa-address-book mr-3 text-2xl text-blue-200"></i>
                     <h2 class="text-xl font-bold text-white">Contatos</h2>
                 </div>
-                <div class="flex justify-center" x-show="!sidebarOpen">
+                <div class="flex justify-center" x-show="!sidebarOpen" x-transition.opacity.duration.200ms>
                     <i class="fas fa-address-book text-2xl text-blue-200"></i>
                 </div>
             </div>
@@ -52,12 +93,12 @@
                     <a href="{{ route('contacts.index') }}"
                         class="{{ request()->routeIs('contacts.index') ? 'bg-blue-800 text-white font-medium' : 'text-blue-100 hover:bg-blue-800 hover:text-white' }} flex items-center gap-3 rounded-lg px-3 py-2 transition-colors">
                         <i class="fas fa-users h-5 w-5"></i>
-                        <span x-show="sidebarOpen">Lista de Contatos</span>
+                        <span x-show="sidebarOpen" x-transition.opacity.duration.200ms>Lista de Contatos</span>
                     </a>
                     <a href="{{ route('contacts.create') }}"
                         class="{{ request()->routeIs('contacts.create') ? 'bg-blue-800 text-white font-medium' : 'text-blue-100 hover:bg-blue-800 hover:text-white' }} flex items-center gap-3 rounded-lg px-3 py-2 transition-colors">
                         <i class="fas fa-user-plus h-5 w-5"></i>
-                        <span x-show="sidebarOpen">Novo Contato</span>
+                        <span x-show="sidebarOpen" x-transition.opacity.duration.200ms>Novo Contato</span>
                     </a>
                 </div>
             </nav>
