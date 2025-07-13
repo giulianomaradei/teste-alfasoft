@@ -16,14 +16,21 @@
             --sidebar-hover: #1e40af;
         }
 
+        /* Prevent horizontal scroll globally */
+        body {
+            overflow-x: hidden;
+        }
+
         .sidebar-collapsed {
             width: 5rem;
             min-width: 5rem;
+            background-color: #1e3a8a !important; /* Force blue background */
         }
 
         .sidebar-expanded {
             width: 16rem;
             min-width: 16rem;
+            background-color: #1e3a8a !important; /* Force blue background */
         }
 
         .transition-width {
@@ -34,6 +41,101 @@
         .sidebar-initial {
             width: 16rem;
             min-width: 16rem;
+            background-color: #1e3a8a !important; /* Force blue background */
+        }
+
+        /* Main content width calculations */
+        .main-content {
+            width: calc(100vw - 16rem); /* Full viewport minus expanded sidebar */
+            min-width: 0; /* Allow flex shrinking */
+            max-width: calc(100vw - 16rem);
+            overflow-x: hidden;
+        }
+
+        .main-content.collapsed {
+            width: calc(100vw - 5rem); /* Full viewport minus collapsed sidebar */
+            max-width: calc(100vw - 5rem);
+        }
+
+        /* Mobile-specific sidebar behavior */
+        @media (max-width: 768px) {
+            .main-content,
+            .main-content.collapsed {
+                width: 100vw;
+                max-width: 100vw;
+            }
+
+            .sidebar-mobile-hidden {
+                transform: translateX(-100%);
+                width: 16rem;
+                min-width: 16rem;
+                background-color: #1e3a8a !important; /* Force blue background */
+            }
+
+            .sidebar-mobile-visible {
+                transform: translateX(0);
+                width: 16rem;
+                min-width: 16rem;
+                background-color: #1e3a8a !important; /* Force blue background */
+            }
+
+            .sidebar-mobile {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 40;
+                transition: transform 0.3s ease;
+                background-color: #1e3a8a !important; /* Force blue background */
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 30;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+
+            .sidebar-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .main-content-mobile {
+                width: 100vw;
+                min-width: 100vw;
+                max-width: 100vw;
+            }
+        }
+
+        /* Desktop behavior */
+        @media (min-width: 769px) {
+            .sidebar-desktop {
+                position: relative;
+                transform: none !important;
+                background-color: #1e3a8a !important; /* Force blue background */
+            }
+        }
+
+        /* Ensure sidebar always has blue background */
+        .sidebar-main {
+            background-color: #1e3a8a !important; /* Force blue background */
+            color: white !important;
+        }
+
+        /* Layout container to prevent overflow */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100vw;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         /* Esconde elementos até Alpine.js estar pronto */
@@ -130,6 +232,11 @@
                 transform: translateY(0);
             }
         }
+
+        /* Ensure all content respects container bounds */
+        * {
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -139,23 +246,55 @@
         <div class="loading-spinner"></div>
     </div>
 
-    <div class="flex min-h-screen w-full" x-data="{
-        sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen')) ?? true,
+    <div class="layout-container" x-data="{
+        sidebarOpen: window.innerWidth >= 769 ? (JSON.parse(localStorage.getItem('sidebarOpen')) ?? true) : false,
+        isMobile: window.innerWidth < 769,
         init() {
             this.$watch('sidebarOpen', value => {
-                localStorage.setItem('sidebarOpen', JSON.stringify(value))
+                if (window.innerWidth >= 769) {
+                    localStorage.setItem('sidebarOpen', JSON.stringify(value))
+                }
+            })
+
+            window.addEventListener('resize', () => {
+                this.isMobile = window.innerWidth < 769
+                if (this.isMobile) {
+                    // On mobile, don't persist sidebar state
+                    this.sidebarOpen = false
+                } else {
+                    // On desktop, restore from localStorage
+                    this.sidebarOpen = JSON.parse(localStorage.getItem('sidebarOpen')) ?? true
+                }
             })
         }
     }" x-cloak>
+        <!-- Mobile Sidebar Overlay -->
+        <div x-show="sidebarOpen && isMobile"
+             @click="sidebarOpen = false"
+             class="sidebar-overlay"
+             :class="{ 'active': sidebarOpen && isMobile }"
+             x-transition:enter="transition-opacity duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"></div>
+
         <!-- Sidebar -->
-        <div :class="sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'"
-            class="transition-width flex flex-col bg-blue-900 text-white sidebar-initial">
+        <div class="sidebar-desktop md:sidebar-desktop sidebar-main"
+             :class="{
+                'sidebar-mobile sidebar-mobile-visible': isMobile && sidebarOpen,
+                'sidebar-mobile sidebar-mobile-hidden': isMobile && !sidebarOpen,
+                'sidebar-expanded': !isMobile && sidebarOpen,
+                'sidebar-collapsed': !isMobile && !sidebarOpen
+             }"
+             class="transition-width flex flex-col bg-blue-900 text-white sidebar-initial">
             <div class="p-4">
-                <div class="flex items-center" x-show="sidebarOpen" x-transition.opacity.duration.200ms>
+                <div class="flex items-center" x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>
                     <i class="fas fa-address-book mr-3 text-2xl text-blue-200"></i>
                     <h2 class="text-xl font-bold text-white">Contatos</h2>
                 </div>
-                <div class="flex justify-center" x-show="!sidebarOpen" x-transition.opacity.duration.200ms>
+                <div class="flex justify-center" x-show="!sidebarOpen && !isMobile" x-transition.opacity.duration.200ms>
                     <i class="fas fa-address-book text-2xl text-blue-200"></i>
                 </div>
             </div>
@@ -163,40 +302,46 @@
             <nav class="flex-1 px-4 pb-4">
                 <div class="space-y-2">
                     <a href="{{ route('contacts.index') }}" data-route="contacts.index"
-                        class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link">
+                        class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link"
+                        @click="if (isMobile) sidebarOpen = false">
                         <i class="fas fa-users h-5 w-5"></i>
-                        <span x-show="sidebarOpen" x-transition.opacity.duration.200ms>Lista de Contatos</span>
+                        <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>Lista de Contatos</span>
                     </a>
                     <a href="{{ route('contacts.create') }}" data-route="contacts.create"
-                        class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link">
+                        class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link"
+                        @click="if (isMobile) sidebarOpen = false">
                         <i class="fas fa-user-plus h-5 w-5"></i>
-                        <span x-show="sidebarOpen" x-transition.opacity.duration.200ms>Novo Contato</span>
+                        <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>Novo Contato</span>
                     </a>
                 </div>
             </nav>
         </div>
 
         <!-- Main Content -->
-        <div class="flex flex-1 flex-col">
+        <div class="main-content flex flex-col"
+             :class="{
+                'main-content-mobile': isMobile,
+                'collapsed': !isMobile && !sidebarOpen
+             }">
             <!-- Header -->
-            <header class="flex h-16 items-center border-b border-gray-200 bg-white px-6 shadow-sm">
+            <header class="flex h-16 items-center border-b border-gray-200 bg-white px-4 md:px-6 shadow-sm">
                 <button @click="sidebarOpen = !sidebarOpen"
-                    class="mr-4 rounded-lg p-2 transition-colors hover:bg-gray-100">
+                    class="mr-3 md:mr-4 rounded-lg p-2 transition-colors hover:bg-gray-100">
                     <i class="fas fa-bars text-gray-600"></i>
                 </button>
-                <h1 class="text-2xl font-bold text-gray-900">Gerenciador de Contatos</h1>
+                <h1 class="text-lg md:text-2xl font-bold text-gray-900 truncate">Gerenciador de Contatos</h1>
             </header>
 
             <!-- Main Content Area -->
-            <main class="flex-1 p-6 page-content" id="mainContent">
+            <main class="flex-1 p-4 md:p-6 page-content overflow-hidden" id="mainContent">
                 @yield('content')
             </main>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-1/2 z-50 hidden -translate-x-1/2">
-        <div class="rounded-lg bg-green-500 px-6 py-3 text-white shadow-lg">
+    <div id="toast" class="fixed bottom-4 left-1/2 z-50 hidden -translate-x-1/2 mx-4 max-w-sm w-full">
+        <div class="rounded-lg bg-green-500 px-4 py-3 text-white shadow-lg text-center">
             <span id="toast-message"></span>
         </div>
     </div>

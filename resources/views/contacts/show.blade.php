@@ -4,13 +4,14 @@
 @section('header', 'Detalhes do Contato')
 
 @section('content')
-    <div class="mx-auto max-w-4xl">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('contacts.index') }}"
-                class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50 page-link">
+                class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 sm:px-4 text-sm sm:text-base transition-colors hover:bg-gray-50 page-link">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Voltar à Lista
+                <span class="hidden sm:inline">Voltar à Lista</span>
+                <span class="sm:hidden">Voltar</span>
             </a>
         </div>
 
@@ -19,45 +20,58 @@
             <div class="lg:col-span-2">
                 <div class="rounded-lg bg-white shadow-md">
                     <!-- Header -->
-                    <div class="border-b border-gray-200 p-6">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <h2 class="mb-2 text-3xl font-bold text-gray-900">{{ $contact->name }}</h2>
-                                <p class="text-lg text-gray-600">ID: {{ $contact->id }}</p>
+                    <div class="border-b border-gray-200 p-4 sm:p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                            <div class="flex-1 min-w-0">
+                                <h2 class="mb-2 text-2xl sm:text-3xl font-bold text-gray-900 break-words">{{ $contact->name }}</h2>
+                                <p class="text-base sm:text-lg text-gray-600">ID: {{ $contact->id }}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <a href="{{ route('contacts.edit', $contact) }}"
-                                    class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 transition-colors hover:border-green-300 hover:bg-green-50 page-link">
-                                    <i class="fas fa-edit mr-2"></i>
-                                    Editar
-                                </a>
-                                <form method="POST" action="{{ route('contacts.destroy', $contact) }}" class="inline">
-                                    @csrf
-                                    @method('DELETE')
+                            <div class="flex gap-2 mt-4 sm:mt-0 sm:ml-4">
+                                <!-- Mobile Layout (Stacked) -->
+                                <div class="flex flex-col gap-2 w-full sm:hidden">
+                                    <a href="{{ route('contacts.edit', $contact) }}"
+                                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm transition-colors hover:border-green-300 hover:bg-green-50 page-link">
+                                        <i class="fas fa-edit mr-2"></i>
+                                        Editar
+                                    </a>
                                     <button type="button" id="deleteBtn"
-                                        class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-red-600 transition-colors hover:border-red-300 hover:bg-red-50">
+                                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm text-red-600 transition-colors hover:border-red-300 hover:bg-red-50">
                                         <i class="fas fa-trash mr-2"></i>
                                         Excluir
                                     </button>
-                                </form>
+                                </div>
+
+                                <!-- Desktop Layout -->
+                                <div class="hidden sm:flex sm:gap-2">
+                                    <a href="{{ route('contacts.edit', $contact) }}"
+                                        class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors hover:border-green-300 hover:bg-green-50 page-link">
+                                        <i class="fas fa-edit mr-2"></i>
+                                        Editar
+                                    </a>
+                                    <button type="button" id="deleteBtn"
+                                        class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm text-red-600 transition-colors hover:border-red-300 hover:bg-red-50">
+                                        <i class="fas fa-trash mr-2"></i>
+                                        Excluir
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Contact Details -->
-                    <div class="p-6">
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div class="p-4 sm:p-6">
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div class="space-y-4">
                                 <div class="flex items-center">
-                                    <i class="fas fa-envelope mr-3 h-5 w-5 text-gray-400"></i>
-                                    <div>
+                                    <i class="fas fa-envelope mr-3 h-5 w-5 text-gray-400 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
                                         <p class="text-sm text-gray-500">Email</p>
-                                        <p class="text-gray-900">{{ $contact->email }}</p>
+                                        <p class="text-gray-900 break-words">{{ $contact->email }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <i class="fas fa-phone mr-3 h-5 w-5 text-gray-400"></i>
-                                    <div>
+                                    <i class="fas fa-phone mr-3 h-5 w-5 text-gray-400 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
                                         <p class="text-sm text-gray-500">Contato</p>
                                         <p class="text-gray-900">{{ $contact->contact }}</p>
                                     </div>
@@ -65,17 +79,17 @@
                             </div>
                             <div class="space-y-4">
                                 <div class="flex items-center">
-                                    <i class="fas fa-id-card mr-3 h-5 w-5 text-gray-400"></i>
-                                    <div>
+                                    <i class="fas fa-id-card mr-3 h-5 w-5 text-gray-400 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
                                         <p class="text-sm text-gray-500">ID</p>
                                         <p class="text-gray-900">{{ $contact->id }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
-                                    <i class="fas fa-user mr-3 h-5 w-5 text-gray-400"></i>
-                                    <div>
+                                    <i class="fas fa-user mr-3 h-5 w-5 text-gray-400 flex-shrink-0"></i>
+                                    <div class="flex-1 min-w-0">
                                         <p class="text-sm text-gray-500">Nome</p>
-                                        <p class="text-gray-900">{{ $contact->name }}</p>
+                                        <p class="text-gray-900 break-words">{{ $contact->name }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -87,13 +101,13 @@
             <!-- Sidebar -->
             <div>
                 <div class="rounded-lg bg-white shadow-md">
-                    <div class="border-b border-gray-200 p-6">
+                    <div class="border-b border-gray-200 p-4 sm:p-6">
                         <h3 class="flex items-center text-lg font-semibold text-gray-900">
                             <i class="fas fa-calendar mr-2"></i>
                             Informações
                         </h3>
                     </div>
-                    <div class="space-y-4 p-6">
+                    <div class="space-y-4 p-4 sm:p-6">
                         <div>
                             <p class="text-sm text-gray-500">Criado em</p>
                             <p class="text-gray-900">
@@ -113,26 +127,26 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black bg-opacity-50">
-        <div class="mx-4 w-full max-w-md rounded-lg bg-white shadow-xl">
+    <div id="deleteModal" class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black bg-opacity-50 p-4">
+        <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
             <div class="p-6">
                 <div class="mb-4 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-3 text-2xl text-red-500"></i>
+                    <i class="fas fa-exclamation-triangle mr-3 text-2xl text-red-500 flex-shrink-0"></i>
                     <h3 class="text-lg font-semibold text-gray-900">Confirmar Exclusão</h3>
                 </div>
 
-                <p class="mb-6 text-gray-600">
+                <p class="mb-6 text-sm sm:text-base text-gray-600">
                     Tem certeza que deseja excluir o contato <strong id="contactName"></strong>?
                     Esta ação não pode ser desfeita.
                 </p>
 
-                <div class="flex justify-end space-x-3">
+                <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
                     <button type="button" id="cancelBtn"
-                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-50">
+                        class="order-2 sm:order-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:bg-gray-50">
                         Cancelar
                     </button>
                     <button type="button" id="confirmDeleteBtn"
-                        class="flex items-center rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
+                        class="order-1 sm:order-2 flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
                         <i class="fas fa-trash mr-2" id="modalDeleteIcon"></i>
                         <svg class="-ml-1 mr-2 hidden h-4 w-4 animate-spin text-white" id="modalLoadingIcon" fill="none"
                             viewBox="0 0 24 24">
@@ -188,11 +202,13 @@
             const deleteModal = document.getElementById('deleteModal');
             const cancelBtn = document.getElementById('cancelBtn');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteBtn = document.getElementById('deleteBtn');
+            const deleteBtns = document.querySelectorAll('#deleteBtn');
 
-            // Delete button event listener
-            deleteBtn.addEventListener('click', function() {
-                openDeleteModal({{ $contact->id }}, '{{ addslashes($contact->name) }}');
+            // Delete button event listeners
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    openDeleteModal({{ $contact->id }}, '{{ addslashes($contact->name) }}');
+                });
             });
 
             cancelBtn.addEventListener('click', closeDeleteModal);
