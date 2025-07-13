@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+    app:
+        build:
+            args:
+                user: ${DOCKER_USER:-docker}
+                uid: ${DOCKER_UID:-1000}
+            context: ./
+            dockerfile: .docker/Dockerfile
+        environment:
+            PHP_IDE_CONFIG: 'serverName=bee.local'
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        image: alfasoft-app-image
+        container_name: alfasoft-app-container
+        restart: 'no'
+        working_dir: /var/www
+        tty: true
+        volumes:
+            - ./:/var/www
+    server:
+        container_name: alfasoft-server
+        image: nginx:1.21.6-alpine
+        tty: true
+        restart: 'no'
+        ports:
+            - "${HTTP_PORT:-80}:80"
+        depends_on:
+            - app
+        volumes:
+            - ./:/var/www
+            - .docker/default.conf:/etc/nginx/conf.d/default.conf
