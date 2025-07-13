@@ -307,14 +307,44 @@
                         <i class="fas fa-users h-5 w-5"></i>
                         <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>Lista de Contatos</span>
                     </a>
-                    <a href="{{ route('contacts.create') }}" data-route="contacts.create"
-                        class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link"
-                        @click="if (isMobile) sidebarOpen = false">
-                        <i class="fas fa-user-plus h-5 w-5"></i>
-                        <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>Novo Contato</span>
-                    </a>
+                    @auth
+                        <a href="{{ route('contacts.create') }}" data-route="contacts.create"
+                            class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link"
+                            @click="if (isMobile) sidebarOpen = false">
+                            <i class="fas fa-user-plus h-5 w-5"></i>
+                            <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms">Novo Contato</span>
+                        </a>
+                    @endauth
                 </div>
             </nav>
+
+            <!-- Authentication Section -->
+            <div class="p-4 border-t border-blue-800">
+                @auth
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 px-3 py-2 text-blue-100">
+                            <i class="fas fa-user h-5 w-5"></i>
+                            <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms class="">{{ auth()->user()->name }}</span>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors text-blue-100 hover:bg-blue-800 hover:text-white w-full text-left">
+                                <i class="fas fa-sign-out-alt h-5 w-5"></i>
+                                <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms>Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="space-y-2">
+                        <a href="{{ route('login') }}" data-route="login"
+                            class="sidebar-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors page-link"
+                            @click="if (isMobile) sidebarOpen = false">
+                            <i class="fas fa-sign-in-alt h-5 w-5"></i>
+                            <span x-show="sidebarOpen || !isMobile" x-transition.opacity.duration.200ms">Login</span>
+                        </a>
+                    </div>
+                @endauth
+            </div>
         </div>
 
         <!-- Main Content -->

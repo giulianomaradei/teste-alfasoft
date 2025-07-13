@@ -22,7 +22,7 @@
             </div>
 
             <div class="p-4 sm:p-6">
-                <form method="POST" action="{{ route('contacts.store') }}" class="space-y-6">
+                <form method="POST" action="{{ route('contacts.store') }}" class="space-y-6" id="contactForm">
                     @csrf
 
                     <!-- Name and Email Row -->
@@ -100,68 +100,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Format contact field to accept only numbers
-            const contactField = document.getElementById('contact');
-
-            contactField.addEventListener('input', function(e) {
-                // Remove non-numeric characters
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-
-                // Limit to 9 digits
-                if (e.target.value.length > 9) {
-                    e.target.value = e.target.value.slice(0, 9);
-                }
-            });
-
-            // Add real-time validation feedback
-            const form = document.querySelector('form');
-            const nameField = document.getElementById('name');
-            const emailField = document.getElementById('email');
+            const form = document.getElementById('contactForm');
             const submitButton = document.getElementById('submitButton');
             const saveIcon = document.getElementById('saveIcon');
             const loadingIcon = document.getElementById('loadingIcon');
             const buttonText = document.getElementById('buttonText');
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const contactField = document.getElementById('contact');
 
-            // Remove errors when user starts typing
-            nameField.addEventListener('input', function() {
-                // Remove border error styling
-                this.classList.remove('border-red-500');
-
-                // Hide error message
-                const errorMessage = this.parentElement.querySelector('.text-red-500');
-                if (errorMessage) {
-                    errorMessage.style.display = 'none';
-                }
-            });
-
-            emailField.addEventListener('input', function() {
-                // Remove border error styling
-                this.classList.remove('border-red-500');
-
-                // Hide error message
-                const errorMessage = this.parentElement.querySelector('.text-red-500');
-                if (errorMessage) {
-                    errorMessage.style.display = 'none';
-                }
-            });
-
-            contactField.addEventListener('input', function(e) {
-                // Remove border error styling
-                this.classList.remove('border-red-500');
-
-                // Hide error message
-                const errorMessage = this.parentElement.querySelector('.text-red-500');
-                if (errorMessage) {
-                    errorMessage.style.display = 'none';
-                }
-            });
-
-            // Form submission loading state
+            // Handle form submission
             form.addEventListener('submit', function(e) {
-                // Prevent multiple submissions by disabling the button immediately
-                submitButton.disabled = true;
-
                 // Show loading state
+                submitButton.disabled = true;
                 saveIcon.classList.add('hidden');
                 loadingIcon.classList.remove('hidden');
                 buttonText.textContent = 'Salvando...';
@@ -171,8 +122,14 @@
                 submitButton.classList.add('bg-blue-500');
             });
 
-            nameField.addEventListener('blur', function() {
-                if (this.value.length <= 5) {
+            // Auto-format contact field
+            contactField.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+            });
+
+            // Real-time validation
+            nameField.addEventListener('input', function() {
+                if (this.value.length < 6) {
                     this.classList.add('border-red-500');
                 } else {
                     this.classList.remove('border-red-500');
